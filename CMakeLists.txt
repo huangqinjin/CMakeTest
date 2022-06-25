@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 set(LANGUAGES C CXX ASM)
 project(CMakeTest ${LANGUAGES})
 
+set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 20)
@@ -206,4 +207,19 @@ foreach(lang IN LISTS LANGUAGES)
 endforeach()
 
 
+
+add_library(greet SHARED greet.cpp)
+set_target_properties(greet PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+    C_VISIBILITY_PRESET hidden
+    CXX_VISIBILITY_PRESET hidden
+    VISIBILITY_INLINES_HIDDEN ON
+)
+
+add_executable(app main.cpp)
+target_link_libraries(app PRIVATE greet)
+
+
+enable_testing()
+add_test(NAME App WORKING_DIRECTORY $<TARGET_FILE_DIR:app> COMMAND app ${CMAKE_MAJOR_VERSION} ${CMAKE_MINOR_VERSION})
 
