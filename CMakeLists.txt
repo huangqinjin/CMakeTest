@@ -223,3 +223,30 @@ target_link_libraries(app PRIVATE greet)
 enable_testing()
 add_test(NAME App WORKING_DIRECTORY $<TARGET_FILE_DIR:app> COMMAND app ${CMAKE_MAJOR_VERSION} ${CMAKE_MINOR_VERSION})
 
+
+if(ANDROID)
+    set(files [[]])
+    find_library(lib NAMES ${CMAKE_ANDROID_STL_TYPE} ${ANDROID_STL})
+    if (lib AND lib MATCHES [[.*\.so$]])
+        list(APPEND files ${lib})
+    endif()
+
+    if(files)
+        add_custom_command(TARGET app POST_BUILD COMMAND_EXPAND_LISTS COMMAND
+            ${CMAKE_COMMAND} -E copy_if_different ${files} $<TARGET_FILE_DIR:app>
+        )
+    endif()
+endif()
+
+if(ANDROID AND CMAKE_CROSSCOMPILING_EMULATOR)
+    file(DOWNLOAD
+        https://www.nuget.org/api/v2/package/android-exe-launcher/33.5.0
+        ${CMAKE_BINARY_DIR}/android-exe-launcher.nupkg
+        EXPECTED_HASH SHA512=3a38453c8495b5f814e42256008adc8704acf1df2cca783797b8a0124d8a2392e492c9f8839498b26538b067270f71ad8c0bc2f9f57b6f7926d75f4e7dd13823
+    )
+
+    file(ARCHIVE_EXTRACT
+        INPUT ${CMAKE_BINARY_DIR}/android-exe-launcher.nupkg
+        DESTINATION ${CMAKE_BINARY_DIR}/android-exe-launcher
+    )
+endif()
