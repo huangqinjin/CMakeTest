@@ -68,6 +68,41 @@
     {
       "name": "android",
       "inherits": "android-without-toolchain"
+    },
+    {
+      "name": "mingw",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "x86_64-w64-mingw32-gcc",
+        "CMAKE_CXX_COMPILER": "x86_64-w64-mingw32-g++",
+        "CMAKE_GNUtoMS": "TRUE"
+      }
+    },
+    {
+      "name": "mingw-llvm",
+      "inherits": "mingw",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "x86_64-w64-mingw32-clang",
+        "CMAKE_CXX_COMPILER": "x86_64-w64-mingw32-clang++",
+        "CMAKE_GNUtoMS": "FALSE"
+      }
+    },
+    {
+      "name": "mingw-unix",
+      "inherits": "mingw",
+      "cacheVariables": {
+        "CMAKE_CROSSCOMPILING_EMULATOR": "env;WINEPATH=/usr/x86_64-w64-mingw32/sys-root/mingw/bin;wine64",
+        "CMAKE_SYSTEM_NAME": "Windows",
+        "CMAKE_GNUtoMS": "FALSE"
+      },
+      "condition": {
+        "string": "${hostSystemName}",
+        "type": "inList",
+        "list" : [
+          "Linux",
+          "Darwin"
+        ]
+      }
     }
   ]
 }
